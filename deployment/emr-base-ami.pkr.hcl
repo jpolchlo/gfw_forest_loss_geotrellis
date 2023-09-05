@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "gdal-3.1.2-linux-aws"
+  ami_name      = "gdal-3.1.2-linux-aws-conda"
   instance_type = "t2.micro"
   region        = "us-east-1"
   source_ami_filter {
@@ -45,26 +45,19 @@ build {
       "GDAL_VERSION=3.1.2",
     ]
     inline = [
-      "sudo yum install gcc-c++.x86_64 cpp.x86_64 sqlite-devel.x86_64 libtiff.x86_64 cmake3.x86_64 -y",
       "cd /tmp",
-      "wget https://download.osgeo.org/proj/proj-$PROJ_VERSION.tar.gz",
-      "tar -xvf proj-$PROJ_VERSION.tar.gz",
-      "cd proj-$PROJ_VERSION",
-      "./configure",
-      "make",
-      "sudo make install",
-      "cd /tmp",
-      "rm -rf proj-$PROJ_VERSION",
-      "wget https://github.com/OSGeo/gdal/releases/download/v$GDAL_VERSION/gdal-$GDAL_VERSION.tar.gz",
-      "tar -xvf gdal-$GDAL_VERSION.tar.gz",
-      "cd gdal-$GDAL_VERSION",
-      "./configure --with-proj=/usr/local --with-python",
-      "make",
-      "sudo make install",
-      "cd /tmp",
-      "sudo rm -rf gdal-$GDAL_VERSION",
-      "which gdalinfo",
-      "gdalinfo --version"
+      "wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh",
+      "sudo sh Miniconda-latest-Linux-x86_64.sh -b -p /usr/local/miniconda",
+      "rm Miniconda-latest-Linux-x86_64.sh",
+      "source ~/.bashrc",
+      "export PATH=/usr/local/miniconda/bin:/usr/local/bin:$PATH",
+      "conda config --add channels conda-forge",
+      "sudo pip3 install tqdm",
+      "sudo /usr/local/miniconda/bin/conda install python=3.6 -y",
+      "sudo /usr/local/miniconda/bin/conda install -c anaconda hdf5 -y",
+      "sudo /usr/local/miniconda/bin/conda install -c conda-forge libnetcdf gdal=$GDAL_VERSION -y",
+      "echo \"export PATH=/usr/local/miniconda/bin:\\$PATH\" >> ~/.bashrc",
+      "echo \"export LD_LIBRARY_PATH=/usr/local/miniconda/lib/:/usr/local/lib:/usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native:/docker/usr/lib/hadoop/lib/native:/docker/usr/lib/hadoop-lzo/lib/native:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib\" >> ~/.bashrc"
     ]
   }
 }
