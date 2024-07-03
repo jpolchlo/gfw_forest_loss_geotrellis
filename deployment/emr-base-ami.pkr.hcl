@@ -34,7 +34,7 @@ source "amazon-ebs" "ubuntu" {
 }
 
 build {
-  name = "learn-packer"
+  name = "gfw-emr-gdal"
   sources = [
     "source.amazon-ebs.ubuntu"
   ]
